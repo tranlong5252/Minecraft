@@ -12,7 +12,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
@@ -21,8 +20,7 @@ import java.util.Objects;
 
 public final class Main extends JavaPlugin implements Listener {
     public HashMap<String, Long> cooldowns = new HashMap<>();
-    Plugin plugin = Main.getPlugin(Main.class);
-    public int cooldownTime = plugin.getConfig().getInt("cooldowncommand");
+    public int cooldownTime = this.getConfig().getInt("cooldowncommand");
 
     @Override
     public void onEnable() {
@@ -32,6 +30,7 @@ public final class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new RideListener(), this);
         getServer().getPluginManager().registerEvents(new JoinQuit(), this);
         getServer().getPluginManager().registerEvents(this, this);
+        this.saveDefaultConfig();
         loadConfig();
         getLogger().info(ChatColor.AQUA + "Plugin đang được bật");
 

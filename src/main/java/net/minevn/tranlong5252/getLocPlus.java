@@ -1,7 +1,6 @@
 package net.minevn.tranlong5252;
 
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -10,9 +9,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
-public class getLocPlus implements CommandExecutor, Listener {
+public class getLocPlus implements CommandExecutor{
 
     @Override @Deprecated
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -25,16 +23,12 @@ public class getLocPlus implements CommandExecutor, Listener {
 
                 String locSerialized = x + ", " + y + ", " + z;
 
-                TextComponent message = new TextComponent("§a§lTọa độ: " + ChatColor.WHITE + locSerialized);
-
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, locSerialized));
-                message.getClickEvent();
-                message.setHoverEvent(new HoverEvent((HoverEvent.Action.SHOW_TEXT),
-                        new ComponentBuilder("Click để copy tọa độ").color(ChatColor.GRAY).italic(true).create()));
-                p.spigot().sendMessage(message);
-
-                if (message.getClickEvent().getAction().equals(ClickEvent.Action.COPY_TO_CLIPBOARD)) {
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("Đã copy!"));
+                if (args.length == 0) {
+                    TextComponent message = new TextComponent("§a§lTọa độ: " + ChatColor.WHITE + locSerialized);
+                    message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, locSerialized));
+                    message.setHoverEvent(new HoverEvent((HoverEvent.Action.SHOW_TEXT),
+                            new ComponentBuilder("Click để copy tọa độ").color(ChatColor.GRAY).italic(true).create()));
+                    p.spigot().sendMessage(message);
                     return true;
                 }
             }

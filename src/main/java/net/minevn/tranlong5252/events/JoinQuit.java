@@ -16,7 +16,12 @@ public class JoinQuit implements Listener {
         Location loc = p.getLocation();
         event.setJoinMessage(ChatColor.GREEN + "[+] " + ChatColor.YELLOW + event.getPlayer().getName());
         p.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 3,1);
-        p.sendTitle("", "§6§o§lWelcome",0, 20, 5);
+        p.sendTitle("", "§6§o§lWelcome back",2, 70, 5);
+        if (!p.hasPlayedBefore()) {
+            event.setJoinMessage(ChatColor.GREEN + "[+] " + ChatColor.AQUA + event.getPlayer().getName());
+            p.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 3,1);
+            p.sendTitle("", "§b§lWelcome to survival 1.16",2, 70, 5);
+        }
     }
 
     @EventHandler
