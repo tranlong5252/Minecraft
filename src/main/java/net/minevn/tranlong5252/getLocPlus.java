@@ -25,18 +25,16 @@ public class getLocPlus implements CommandExecutor, Listener {
 
                 String locSerialized = x + ", " + y + ", " + z;
 
-                if (args.length == 0) {
-                    TextComponent message = new TextComponent("§a§lTọa độ: " + ChatColor.WHITE + locSerialized);
+                TextComponent message = new TextComponent("§a§lTọa độ: " + ChatColor.WHITE + locSerialized);
 
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, locSerialized));
-                    message.getClickEvent();
-                    message.setHoverEvent(new HoverEvent((HoverEvent.Action.SHOW_TEXT),
-                            new ComponentBuilder("Click để copy tọa độ").color(ChatColor.GRAY).italic(true).create()));
-                    p.spigot().sendMessage(message);
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, locSerialized));
+                message.getClickEvent();
+                message.setHoverEvent(new HoverEvent((HoverEvent.Action.SHOW_TEXT),
+                        new ComponentBuilder("Click để copy tọa độ").color(ChatColor.GRAY).italic(true).create()));
+                p.spigot().sendMessage(message);
 
-                    if (message.getClickEvent().getAction().equals(ClickEvent.Action.COPY_TO_CLIPBOARD)) {
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("Đã copy!"));
-                    }
+                if (message.getClickEvent().getAction().equals(ClickEvent.Action.COPY_TO_CLIPBOARD)) {
+                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("Đã copy!"));
                     return true;
                 }
             }

@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
@@ -20,7 +21,9 @@ import java.util.Objects;
 
 public final class Main extends JavaPlugin implements Listener {
     public HashMap<String, Long> cooldowns = new HashMap<>();
-    public int cooldownTime = 10;
+    Plugin plugin = Main.getPlugin(Main.class);
+    public int cooldownTime = plugin.getConfig().getInt("cooldowncommand");
+
     @Override
     public void onEnable() {
         Objects.requireNonNull(getCommand("bruh")).setExecutor(new bruh());
