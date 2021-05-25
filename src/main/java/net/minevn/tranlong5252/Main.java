@@ -1,92 +1,75 @@
 package net.minevn.tranlong5252;
 
-import net.minevn.tranlong5252.events.JoinQuit;
+import net.minevn.tranlong5252.commands.BruhCommand;
+import net.minevn.tranlong5252.commands.GetLocCommand;
 import net.minevn.tranlong5252.events.RideListener;
-import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
+import net.minevn.tranlong5252.events.TridentListener;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
 
-public final class Main extends JavaPlugin implements Listener {
-    public HashMap<String, Long> cooldowns = new HashMap<>();
-    public int cooldownTime = this.getConfig().getInt("cooldowncommand");
+public final class Main extends JavaPlugin {
+
+    public static final String PREFIX = "§cUtility §8» §7";
+    public static Main plugin;
+    private File configFile;
+    private YamlConfiguration config;
+    public HashMap<String, Long> cooldown = new HashMap<>();
+    public int cooldownTime;
 
     @Override
     public void onEnable() {
-        Objects.requireNonNull(getCommand("bruh")).setExecutor(new bruh());
-        Objects.requireNonNull(getCommand("hello")).setExecutor(new hello());
-        Objects.requireNonNull(getCommand("getloc+")).setExecutor(new getLocPlus());
+        plugin = this;
+        this.configFile = getConfig("config", this);
+        this.reload();
+        if (!this.config.isSet("cooldown-command")) {
+            this.config.set("cooldown-command", 10);
+            this.save();
+        }
+        cooldownTime = this.config.getInt("cooldown-command");
+
+        Objects.requireNonNull(getCommand("bruh")).setExecutor(new BruhCommand(this));
+        Objects.requireNonNull(getCommand("gl+")).setExecutor(new GetLocCommand());
         getServer().getPluginManager().registerEvents(new RideListener(), this);
-        getServer().getPluginManager().registerEvents(new JoinQuit(), this);
-        getServer().getPluginManager().registerEvents(this, this);
-        this.saveDefaultConfig();
-        loadConfig();
-        getLogger().info(ChatColor.AQUA + "Plugin đang được bật");
+        getServer().getPluginManager().registerEvents(new TridentListener(), this);;
+        getLogger().info(PREFIX + "Plugin đang bật");
 
     }
 
-    public void loadConfig() {
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+    public void reload() {
+        this.config = YamlConfiguration.loadConfiguration(this.configFile);
+    }
+    public void save() {
+        try {
+            this.config.save(this.configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onDisable() {
-        getLogger().info(ChatColor.AQUA + "Plugin đã được tắt");
-
+        getLogger().info(PREFIX + "Plugin đã được tắt");
     }
 
-    @EventHandler
-    public void trident(PlayerInteractEvent e) {
-        if (e.getHand() != EquipmentSlot.HAND) {
-            return;
+    public static File getConfig(final String name, final Plugin plugin) {
+        final File dataFolder = plugin.getDataFolder();
+        if (!dataFolder.exists()) {
+            dataFolder.mkdirs();
         }
-        Player p = e.getPlayer();
-        ItemStack i = p.getInventory().getItemInMainHand();
-        if (i.getType() == Material.BOOK && p.hasPermission("tdt.throw") && p.getGameMode() == GameMode.CREATIVE) {
-
-            Location loc = p.getLocation();
-            Vector playerDirection = loc.getDirection();
-            Trident trident = p.launchProjectile(Trident.class, playerDirection.multiply(3F));
-            trident.setMetadata("bonk", new FixedMetadataValue(this, "cuccu"));
-            trident.setGlowing(true);
-            p.playSound(loc, Sound.ITEM_TRIDENT_THROW, 5.0F, 1F);
-            trident.setPickupStatus(Trident.PickupStatus.DISALLOWED);
-        }
-    }
-
-    @EventHandler
-    public void onHit(ProjectileHitEvent e){
-        if (!e.getEntity().hasMetadata("bonk")) {
-            return;
-        }
-        if (e.getHitEntity() != null) {
-            Entity env = e.getHitEntity();
-            if(env instanceof LivingEntity) {
-                ((LivingEntity) env).setHealth(0);
-                env.sendMessage("vì bạn xứng đáng");
-
-            }
-            return;
-        }
-        if (e.getHitBlock() != null) {
-            Block b = e.getHitBlock();
-            if (b.getType() == Material.TNT){
-                b.setType(Material.AIR);
-                TNTPrimed tnt = b.getWorld().spawn(b.getLocation(), TNTPrimed.class);
-                tnt.setFuseTicks(0);
+        final File configFile = new File(plugin.getDataFolder() + File.separator + name + ".yml");
+        if (!configFile.exists()) {
+            try {
+                configFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        return configFile;
     }
 }

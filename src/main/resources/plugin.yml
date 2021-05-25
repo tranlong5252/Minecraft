@@ -4,9 +4,7 @@ main: net.minevn.tranlong5252.Main
 api-version: 1.16
 authors: [ tranlong5252 ]
 commands:
-  hello:
-    description: làm chơi
   bruh:
     description: làm chơi
-  getloc+:
+  gl+:
     description: lấy tọa độ có thể copy

@@ -1,3 +1,1 @@
-cooldowncommand: 10
-onJoin:
-onLeave:
+cooldown-command: 10

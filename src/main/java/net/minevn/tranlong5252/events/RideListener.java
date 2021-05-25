@@ -2,42 +2,50 @@ package net.minevn.tranlong5252.events;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minevn.tranlong5252.tasks.Tasks;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.util.Vector;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
 
 public class RideListener implements Listener {
 
-    @EventHandler @Deprecated
-    public void Ride(PlayerInteractAtEntityEvent e) {
-        Player p = e.getPlayer();
-
-        if (e.getPlayer().isSneaking() && e.getRightClicked() instanceof Player
-                && p.hasPermission("tl.ride")) {
-
-            Player other = (Player) e.getRightClicked();
-            p.setPassenger(other);
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§eBạn đã đem " + "§f" + other.getName() + " §elên người"));
-            other.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§eBạn đã ngồi lên " + "§f" + p.getName()));
-
+    @EventHandler
+    public void Ride(PlayerInteractEntityEvent event, Plugin plugin) {
+        Player player = event.getPlayer();
+        if (!(event.getRightClicked() instanceof LivingEntity) || !player.hasPermission("tl.ride")) return;
+        if (player.getPassengers().isEmpty() && player.isSneaking()) {
+            LivingEntity target = (LivingEntity) event.getRightClicked();
+            player.addPassenger(target);
+            target.setMetadata("rode", new FixedMetadataValue(plugin, true));
+            Tasks.sync(() -> target.removeMetadata("rode", plugin), 1, plugin);
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§eBạn đã đem " + "§f" + target.getName() + " §elên người"));
+            if (target instanceof Player) {
+                Player pTarget = (Player) target;
+                pTarget.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§eBạn đã ngồi lên " + "§f" + player.getName()));
+            }
         }
     }
-    @EventHandler @Deprecated
-    public void Eject(PlayerInteractEvent event) {
-        Player thrower = event.getPlayer();
-        Player toThrow = (Player)thrower.getPassenger();
-        if (event.getAction() == Action.RIGHT_CLICK_AIR && event.getPlayer().getPassenger() != null && event.getPlayer().getPassenger() instanceof Player) {
-            toThrow.getVehicle().eject();
 
-            Vector dir = thrower.getLocation().getDirection();
-            toThrow.setVelocity(dir.multiply(0.7));
-            toThrow.setFallDistance(-10.0F);
-            thrower.sendMessage("bump");
-
+    @EventHandler
+    public void applyInteractBlock(PlayerInteractEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
+        Player player = event.getPlayer();
+        if (!player.getPassengers().isEmpty()) {
+            for (Entity en : player.getPassengers()) {
+                if (!en.hasMetadata("rode")) {
+                    player.removePassenger(en);
+                    en.setVelocity(player.getLocation().getDirection());
+                }
+            }
         }
     }
 }

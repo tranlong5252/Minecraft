@@ -1,4 +1,4 @@
-package net.minevn.tranlong5252;
+package net.minevn.tranlong5252.commands;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -11,8 +11,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class getLocPlus implements CommandExecutor{
-    @Override @Deprecated
+public class GetLocCommand implements CommandExecutor{
+
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("getloc+")) {
             if (sender instanceof Player) {
