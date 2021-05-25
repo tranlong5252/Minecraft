@@ -1,4 +1,4 @@
-name: tranlong5252
+name: Ultility
 version: ${project.version}
 main: net.minevn.tranlong5252.Main
 api-version: 1.16
